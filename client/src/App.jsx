@@ -186,10 +186,10 @@ function App() {
   if (!isNamed) {
     return (
       <div className="page">
-        <header className="hero">
+        <header className="hero hero-vertical">
           <div>
             <p className="eyebrow">Pick a name</p>
-            <h1>Paper Quiz</h1>
+            <h1>Economics Quiz</h1>
             <p className="lede">Save a name to join the live quiz. You will start from the current question; missed ones do not score.</p>
           </div>
           <div className="actions stacked">
@@ -223,7 +223,7 @@ function App() {
         <header className="hero">
           <div>
             <p className="eyebrow">Lobby</p>
-            <h1>Paper Quiz</h1>
+            <h1>Economics Quiz</h1>
             <p className="lede">Player: {meta.name}. Hit start to move everyone to question 1.</p>
             <div className="pill-row">
               <span className={`pill status ${connection}`}>{connection}</span>
