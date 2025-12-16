@@ -37,6 +37,10 @@ function App() {
   const [connVersion, setConnVersion] = useState(0)
   const [tick, setTick] = useState(0)
   const [hasLeft, setHasLeft] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [passwordInput, setPasswordInput] = useState(['', '', '', ''])
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
 
   const socketRef = useRef(null)
   const timeBaseRef = useRef({ left: 0, syncedAt: Date.now() })
@@ -64,11 +68,26 @@ function App() {
           setMeta((prev) => ({ ...prev, name: me.name, color: me.color }))
         }
       }
+      
+      // Reset admin status when returning to lobby
+      if (state?.phase === 'lobby') {
+        setIsAdmin(false)
+        setShowAdminPanel(false)
+      }
     }
 
-    socket.addEventListener('open', () => setConnection('connected'))
-    socket.addEventListener('close', () => setConnection('disconnected'))
-    socket.addEventListener('error', () => setConnection('disconnected'))
+    socket.addEventListener('open', () => {
+      console.log('WebSocket connected to', WS_URL)
+      setConnection('connected')
+    })
+    socket.addEventListener('close', () => {
+      console.log('WebSocket disconnected')
+      setConnection('disconnected')
+    })
+    socket.addEventListener('error', (error) => {
+      console.error('WebSocket error:', error)
+      setConnection('disconnected')
+    })
 
     socket.addEventListener('message', (event) => {
       let data
@@ -124,6 +143,10 @@ function App() {
     const socket = socketRef.current
     if (socket?.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(payload))
+      return true
+    } else {
+      console.warn('WebSocket not connected, readyState:', socket?.readyState)
+      return false
     }
   }
 
@@ -170,6 +193,85 @@ function App() {
   }
   const answer = (idx) => send({ type: 'answer', optionIndex: idx })
   const reconnect = () => setConnVersion((n) => n + 1)
+  const returnToLobby = () => send({ type: 'return-to-lobby' })
+  const adminRestart = () => {
+    if (!isAdmin) {
+      alert('You are not an admin. Please login as admin first.')
+      return
+    }
+    
+    const socket = socketRef.current
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      alert('WebSocket connection is not open. Please reconnect.')
+      reconnect()
+      return
+    }
+    
+    console.log('Sending admin-restart command')
+    const sent = send({ type: 'admin-restart', password: '1234' })
+    if (sent) {
+      setShowAdminPanel(false)
+    } else {
+      alert('Failed to send restart command. Please check your connection.')
+    }
+  }
+  
+  
+  const handlePasswordInput = (index, value) => {
+    // Only allow numeric input
+    const numericValue = value.replace(/[^0-9]/g, '')
+    if (numericValue.length > 1) return
+    
+    const newInput = [...passwordInput]
+    newInput[index] = numericValue
+    setPasswordInput(newInput)
+    
+    // Auto-focus next input
+    if (numericValue && index < 3) {
+      const nextInput = document.getElementById(`password-${index + 1}`)
+      if (nextInput) nextInput.focus()
+    }
+    
+    // Auto-submit when all 4 digits are entered
+    if (index === 3 && numericValue) {
+      // Use the updated newInput array directly (before state update)
+      const finalPassword = newInput.join('')
+      if (finalPassword.length === 4) {
+        setTimeout(() => {
+          // Verify password and submit
+          if (finalPassword === '1234') {
+            setIsAdmin(true)
+            setShowPasswordModal(false)
+            setShowAdminPanel(true)
+            setPasswordInput(['', '', '', ''])
+          } else {
+            alert('Incorrect password')
+            setPasswordInput(['', '', '', ''])
+          }
+        }, 150)
+      }
+    }
+  }
+  
+  const handlePasswordSubmitManual = () => {
+    const password = passwordInput.join('')
+    if (password === '1234') {
+      setIsAdmin(true)
+      setShowPasswordModal(false)
+      setShowAdminPanel(true)
+      setPasswordInput(['', '', '', ''])
+    } else {
+      alert('Incorrect password')
+      setPasswordInput(['', '', '', ''])
+    }
+  }
+  
+  const handlePasswordKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !passwordInput[index] && index > 0) {
+      const prevInput = document.getElementById(`password-${index - 1}`)
+      if (prevInput) prevInput.focus()
+    }
+  }
 
   const sortedScores = [...(session.players || [])].sort(
     (a, b) => (session.scores[b.id] || 0) - (session.scores[a.id] || 0),
@@ -301,6 +403,71 @@ function App() {
   // Quiz page
   return (
     <div className="page">
+      {/* Admin Button - Top Right */}
+      <button
+        className="admin-restart-btn"
+        onClick={() => {
+          if (isAdmin) {
+            setShowAdminPanel(!showAdminPanel)
+          } else {
+            setShowPasswordModal(true)
+          }
+        }}
+        title={isAdmin ? "Admin Panel" : "Admin Login"}
+      >
+        Admin
+      </button>
+      
+      {/* Admin Panel */}
+      {isAdmin && showAdminPanel && (
+        <div className="admin-panel">
+          <div className="admin-panel-content">
+            <h4>Admin Panel</h4>
+            <button className="primary" onClick={adminRestart}>
+              Restart Quiz
+            </button>
+            <button className="ghost" onClick={() => setShowAdminPanel(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Admin Verification</h3>
+            <p>Enter 4-digit password</p>
+            <div className="password-inputs">
+              {[0, 1, 2, 3].map((index) => (
+                <input
+                  key={index}
+                  id={`password-${index}`}
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  value={passwordInput[index]}
+                  onChange={(e) => handlePasswordInput(index, e.target.value)}
+                  onKeyDown={(e) => handlePasswordKeyDown(index, e)}
+                  className="password-digit"
+                  autoFocus={index === 0}
+                />
+              ))}
+            </div>
+            <div className="modal-actions">
+              <button onClick={() => setShowPasswordModal(false)} className="ghost">
+                Cancel
+              </button>
+              <button onClick={handlePasswordSubmitManual} className="primary">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <header className="hero">
         <div>
           <p className="eyebrow">Live Quiz</p>
@@ -310,12 +477,18 @@ function App() {
             <span className="pill session">
               {statusCopy} · {session.questionIndex + 1}/{session.totalQuestions}
             </span>
+            {isAdmin && <span className="pill" style={{ background: '#ffc107', color: '#000' }}>Admin</span>}
           </div>
         </div>
         <div className="actions stacked">
           <div className="control-row">
-            <button onClick={next} disabled={session.phase !== 'reveal'}>
-              Next question
+            <button 
+              onClick={next} 
+              disabled={session.phase !== 'reveal' || (session.questionIndex + 1 >= session.totalQuestions)}
+            >
+              {session.phase === 'reveal' && session.questionIndex + 1 >= session.totalQuestions 
+                ? 'View Results' 
+                : 'Next question'}
             </button>
             <button className="ghost" onClick={goLobby}>
               Leave (only me)
@@ -387,6 +560,32 @@ function App() {
                   })}
                 </div>
               </>
+            ) : session.phase === 'ended' || (session.phase === 'reveal' && session.questionIndex + 1 >= session.totalQuestions) ? (
+              <div className="finished-screen">
+                <h2>🎉 Quiz Finished!</h2>
+                <p className="finished-subtitle">Final Rankings</p>
+                <div className="final-rankings">
+                  {sortedScores.map((player, index) => (
+                    <div key={player.id} className={`ranking-item ${meta.id === player.id ? 'me' : ''} ${index === 0 ? 'winner' : ''}`}>
+                      <span className="rank-number">#{index + 1}</span>
+                      <span className="dot" style={{ background: player.color }} />
+                      <span className="name">{player.name || 'Unnamed'}</span>
+                      <span className="score">{session.scores[player.id] || 0} / {session.totalQuestions}</span>
+                      {index === 0 && <span className="badge">🏆 Winner</span>}
+                    </div>
+                  ))}
+                </div>
+                <div className="finished-actions">
+                  <button className="primary" onClick={returnToLobby}>
+                    Return to Lobby
+                  </button>
+                  {isAdmin && (
+                    <button className="primary" onClick={adminRestart}>
+                      Restart Quiz
+                    </button>
+                  )}
+                </div>
+              </div>
             ) : (
               <div className="empty">
                 <p>Finished. Go back to Lobby to start a new round.</p>

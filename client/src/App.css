@@ -394,6 +394,213 @@ button.ghost {
   line-height: 1.4;
 }
 
+/* Admin Button */
+.admin-restart-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-restart-btn:hover {
+  background: var(--ink);
+  color: var(--panel);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Admin Panel */
+.admin-panel {
+  position: fixed;
+  top: 50px;
+  right: 16px;
+  z-index: 999;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+}
+
+.admin-panel-content {
+  padding: 16px;
+}
+
+.admin-panel-content h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.admin-panel-content button {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.admin-panel-content button:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+  .admin-restart-btn {
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  .admin-panel {
+    top: 45px;
+    right: 10px;
+  }
+}
+
+/* Password Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+}
+
+.modal-content p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.password-inputs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.password-digit {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  transition: all 120ms ease;
+}
+
+.password-digit:focus {
+  outline: none;
+  border-color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 0 0 3px rgba(15, 15, 15, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Finished Screen */
+.finished-screen {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.finished-screen h2 {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+}
+
+.finished-subtitle {
+  color: var(--muted);
+  margin: 0 0 24px;
+  font-size: 16px;
+}
+
+.final-rankings {
+  max-width: 500px;
+  margin: 0 auto 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ranking-item {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  transition: all 120ms ease;
+}
+
+.ranking-item.me {
+  border-color: var(--ink);
+  background: #f1f0ed;
+}
+
+.ranking-item.winner {
+  border-color: var(--accent);
+  background: #fbf4eb;
+  box-shadow: 0 4px 12px rgba(199, 161, 122, 0.2);
+}
+
+.rank-number {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--muted);
+  min-width: 30px;
+}
+
+.ranking-item.winner .rank-number {
+  color: var(--accent-ink);
+  font-size: 20px;
+}
+
+.finished-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 1024px) {
   .hero {
     grid-template-columns: 1fr;
@@ -409,5 +616,10 @@ button.ghost {
   }
   .control-row {
     flex-direction: column;
+  }
+  .password-digit {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
   }
 }

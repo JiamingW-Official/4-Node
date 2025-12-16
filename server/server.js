@@ -18,6 +18,7 @@ const questions = [
 ]
 
 const clients = new Map()
+const ADMIN_PASSWORD = '1234'
 let session = {
   phase: 'lobby', // lobby | question | reveal | ended
   questionIndex: -1,
@@ -185,7 +186,44 @@ server.on('connection', (ws) => {
       }
       case 'next': {
         if (session.phase === 'reveal') {
-          nextQuestion()
+          // If this is the last question, go to ended phase instead
+          if (session.questionIndex + 1 >= questions.length) {
+            session.phase = 'ended'
+            session.endsAt = null
+            broadcastState()
+          } else {
+            nextQuestion()
+          }
+        }
+        break
+      }
+      case 'admin-restart': {
+        // eslint-disable-next-line no-console
+        console.log('Admin restart requested, password:', data.password)
+        if (data.password === ADMIN_PASSWORD) {
+          // Reset to lobby and clear all data
+          session.phase = 'lobby'
+          session.questionIndex = -1
+          session.endsAt = null
+          session.answers = {}
+          session.scores = {}
+          // eslint-disable-next-line no-console
+          console.log('Admin restart executed - reset to lobby')
+          broadcastState()
+        } else {
+          // eslint-disable-next-line no-console
+          console.log('Admin restart failed: incorrect password')
+        }
+        break
+      }
+      case 'return-to-lobby': {
+        if (session.phase === 'ended') {
+          session.phase = 'lobby'
+          session.questionIndex = -1
+          session.endsAt = null
+          session.answers = {}
+          session.scores = {}
+          broadcastState()
         }
         break
       }
