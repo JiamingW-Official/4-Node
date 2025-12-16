@@ -36,7 +36,7 @@ jobs:
       - name: Build
         working-directory: ./client
         env:
-          VITE_WS_URL: ${{ secrets.VITE_WS_URL || 'wss://your-websocket-server.com' }}
+          VITE_WS_URL: ${{ secrets.VITE_WS_URL || 'wss://four-node-2025.onrender.com' }}
         run: npm run build
 
       - name: Setup Pages

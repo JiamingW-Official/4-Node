@@ -263,21 +263,18 @@ npm install
 
 ### Running Locally
 
-1. **Start the WebSocket server**
-```bash
-cd server
-npm start
-```
-Server runs on `ws://localhost:3001`
+**Note**: The app now uses Render WebSocket server for all environments (local and production). No need to run a local server!
 
-2. **Start the development client** (in a new terminal)
+1. **Start the development client**
 ```bash
 cd client
 npm run dev
 ```
-Client runs on `http://localhost:5173`
+Client runs on `http://localhost:5173` (or `http://localhost:5174`)
 
-3. **Open multiple browser tabs** to test multiplayer functionality
+2. **Open multiple browser tabs** to test multiplayer functionality
+
+The app will automatically connect to `wss://four-node-2025.onrender.com`
 
 ### Building for Production
 

@@ -1,22 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
-// Auto-detect WebSocket URL based on environment
+// Use Render WebSocket server for all environments
 const getWebSocketURL = () => {
   // Use environment variable if set (highest priority)
   if (import.meta.env.VITE_WS_URL && import.meta.env.VITE_WS_URL !== 'wss://your-websocket-server.com') {
     return import.meta.env.VITE_WS_URL
   }
   
-  // If running on GitHub Pages, try to use wss:// (you need to deploy a WebSocket server)
-  if (window.location.hostname.includes('github.io')) {
-    // Try to get from environment variable first
-    // If not set, return null to show helpful error message
-    return null
-  }
-  
-  // Default to localhost for local development
-  return 'ws://localhost:3001'
+  // Use Render WebSocket server for all environments (local and production)
+  return 'wss://four-node-2025.onrender.com'
 }
 
 const WS_URL = getWebSocketURL()
@@ -225,19 +218,9 @@ function App() {
               }}>
                 <strong>⚠️ WebSocket Server Not Configured</strong>
                 <p style={{ margin: '8px 0 0', fontSize: '14px' }}>
-                  This app requires a WebSocket server to function. 
-                  {window.location.hostname.includes('github.io') ? (
-                    <>
-                      <br />To use on GitHub Pages, you need to:
-                      <br />1. Deploy the WebSocket server (Heroku, Railway, Render, etc.)
-                      <br />2. Set the <code>VITE_WS_URL</code> environment variable before building
-                      <br />3. Rebuild and redeploy
-                    </>
-                  ) : (
-                    <>
-                      <br />Please start the server: <code>cd server && npm start</code>
-                    </>
-                  )}
+                  Unable to connect to Render WebSocket server.
+                  <br />Make sure the server is running at: <code>wss://four-node-2025.onrender.com</code>
+                  <br />Note: Render free tier services may take a few seconds to wake up after inactivity.
                 </p>
               </div>
             )}
