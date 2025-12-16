@@ -58,6 +58,7 @@ function App() {
     setConnection('connecting')
 
     const handleState = (state) => {
+      const prevPhase = session.phase
       setSession(state || emptySession())
       timeBaseRef.current = { left: state?.timeLeft || 0, syncedAt: Date.now() }
 
@@ -69,9 +70,8 @@ function App() {
         }
       }
       
-      // Reset admin status when returning to lobby
-      if (state?.phase === 'lobby') {
-        setIsAdmin(false)
+      // Reset admin panel when returning to lobby (but keep admin status)
+      if (state?.phase === 'lobby' && prevPhase !== 'lobby') {
         setShowAdminPanel(false)
       }
     }
@@ -211,6 +211,7 @@ function App() {
     const sent = send({ type: 'admin-restart', password: '1234' })
     if (sent) {
       setShowAdminPanel(false)
+      console.log('Admin restart command sent successfully')
     } else {
       alert('Failed to send restart command. Please check your connection.')
     }
