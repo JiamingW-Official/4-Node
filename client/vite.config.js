@@ -4,5 +4,6 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/4-Node/',
+  // Use '/' for local development, '/4-Node/' for GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/4-Node/' : '/',
 })

@@ -208,5 +208,7 @@ setInterval(() => {
 
 server.on('listening', () => {
   // eslint-disable-next-line no-console
-  console.log(`Quiz WebSocket server running on ws://localhost:${PORT}`)
+  const protocol = process.env.NODE_ENV === 'production' ? 'wss' : 'ws'
+  const host = process.env.HOST || 'localhost'
+  console.log(`Quiz WebSocket server running on ${protocol}://${host}:${PORT}`)
 })

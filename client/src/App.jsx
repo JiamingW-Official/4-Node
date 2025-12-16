@@ -1,7 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001'
+// Auto-detect WebSocket URL based on environment
+const getWebSocketURL = () => {
+  // Use environment variable if set (highest priority)
+  if (import.meta.env.VITE_WS_URL && import.meta.env.VITE_WS_URL !== 'wss://your-websocket-server.com') {
+    return import.meta.env.VITE_WS_URL
+  }
+  
+  // If running on GitHub Pages, try to use wss:// (you need to deploy a WebSocket server)
+  if (window.location.hostname.includes('github.io')) {
+    // Try to get from environment variable first
+    // If not set, return null to show helpful error message
+    return null
+  }
+  
+  // Default to localhost for local development
+  return 'ws://localhost:3001'
+}
+
+const WS_URL = getWebSocketURL()
 const QUESTION_MS = 15000
 
 const emptySession = () => ({
@@ -33,6 +51,11 @@ function App() {
   const lastIdentityRef = useRef(null)
 
   useEffect(() => {
+    if (!WS_URL) {
+      setConnection('disconnected')
+      return
+    }
+    
     const socket = new WebSocket(WS_URL)
     socketRef.current = socket
     setConnection('connecting')
@@ -191,6 +214,49 @@ function App() {
             <p className="eyebrow">Pick a name</p>
             <h1>Economics Quiz</h1>
             <p className="lede">Save a name to join the live quiz. You will start from the current question; missed ones do not score.</p>
+            {!WS_URL && (
+              <div style={{ 
+                marginTop: '16px', 
+                padding: '12px', 
+                background: '#fff3cd', 
+                border: '1px solid #ffc107', 
+                borderRadius: '6px',
+                color: '#856404'
+              }}>
+                <strong>⚠️ WebSocket Server Not Configured</strong>
+                <p style={{ margin: '8px 0 0', fontSize: '14px' }}>
+                  This app requires a WebSocket server to function. 
+                  {window.location.hostname.includes('github.io') ? (
+                    <>
+                      <br />To use on GitHub Pages, you need to:
+                      <br />1. Deploy the WebSocket server (Heroku, Railway, Render, etc.)
+                      <br />2. Set the <code>VITE_WS_URL</code> environment variable before building
+                      <br />3. Rebuild and redeploy
+                    </>
+                  ) : (
+                    <>
+                      <br />Please start the server: <code>cd server && npm start</code>
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
+            {connection === 'disconnected' && WS_URL && (
+              <div style={{ 
+                marginTop: '16px', 
+                padding: '12px', 
+                background: '#f8d7da', 
+                border: '1px solid #dc3545', 
+                borderRadius: '6px',
+                color: '#721c24'
+              }}>
+                <strong>❌ Connection Failed</strong>
+                <p style={{ margin: '8px 0 0', fontSize: '14px' }}>
+                  Unable to connect to WebSocket server at <code>{WS_URL}</code>
+                  <br />Make sure the server is running and accessible.
+                </p>
+              </div>
+            )}
           </div>
           <div className="actions stacked">
             <form className="name-form" onSubmit={handleNameSubmit}>
@@ -200,13 +266,14 @@ function App() {
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 placeholder="Enter name"
+                disabled={!WS_URL || connection === 'disconnected'}
               />
-              <button type="submit" disabled={!nameInput.trim()}>
+              <button type="submit" disabled={!nameInput.trim() || !WS_URL || connection === 'disconnected'}>
                 Save
               </button>
             </form>
             <div className="control-row">
-              <button className="ghost" onClick={reconnect}>
+              <button className="ghost" onClick={reconnect} disabled={!WS_URL}>
                 Reconnect
               </button>
             </div>

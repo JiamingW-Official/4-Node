@@ -290,12 +290,33 @@ This creates optimized files in `client/dist/`
 
 ## 📦 Deployment
 
-### GitHub Pages (Frontend)
+### Quick Start (Automated)
+
+This project includes GitHub Actions for automatic deployment. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+
+**Quick Steps:**
+
+1. **Deploy WebSocket Server** (choose one):
+   - **Railway** (Recommended): Connect GitHub repo, select `server` folder, deploy
+   - **Render**: Create Web Service, set root directory to `server`
+   - **Heroku**: Use the included `Procfile`
+
+2. **Configure GitHub Secret**:
+   - Go to repository Settings → Secrets and variables → Actions
+   - Add secret: `VITE_WS_URL` = `wss://your-server-url.com`
+
+3. **Enable GitHub Pages**:
+   - Settings → Pages → Source: "GitHub Actions"
+   - Push to `main` branch to trigger automatic deployment
+
+### Manual Deployment
+
+#### GitHub Pages (Frontend)
 
 1. **Build the client**
 ```bash
 cd client
-npm run build
+VITE_WS_URL=wss://your-server-url.com npm run build
 ```
 
 2. **Deploy to docs folder** (Windows PowerShell)
@@ -319,19 +340,25 @@ The app will be available at: `https://JiamingW-Official.github.io/4-Node/`
 
 ### WebSocket Server Deployment
 
-The WebSocket server needs to run on a platform that supports persistent connections:
-- **Heroku**: Add `ws` buildpack, set `PORT` env var
-- **Railway**: Deploy Node.js app, expose port
-- **Render**: Web service with WebSocket support
-- **DigitalOcean App Platform**: Supports WebSocket
+The WebSocket server needs to run on a platform that supports persistent connections. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed platform-specific instructions.
+
+**Supported Platforms:**
+- **Railway** (Recommended): Simple, free tier available
+- **Render**: Free tier with WebSocket support
+- **Heroku**: Requires credit card for free tier
+- **DigitalOcean App Platform**: Paid plans
 
 **Environment Variables:**
-- `PORT`: Server port (default: 3001)
+- `PORT`: Server port (automatically set by platform, default: 3001)
 
 **Client Configuration:**
-Update `VITE_WS_URL` in client environment or `.env` file:
-```
-VITE_WS_URL=wss://your-server-domain.com
+Set `VITE_WS_URL` environment variable before building:
+```bash
+# Windows PowerShell
+$env:VITE_WS_URL="wss://your-server-domain.com"
+npm run build
+
+# Or set in GitHub Secrets for automatic deployment
 ```
 
 ## 🎮 How to Use
