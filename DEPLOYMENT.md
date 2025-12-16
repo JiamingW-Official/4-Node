@@ -50,7 +50,7 @@
    - 在 GitHub 仓库设置中添加 Secret：`VITE_WS_URL` = `wss://your-app.railway.app`
    - 或者手动构建时设置环境变量
 
-### 选项 2: Render
+### 选项 2: Render（推荐，免费且简单）
 
 1. **注册 Render**：
    - 访问 https://render.com
@@ -58,18 +58,33 @@
 
 2. **创建 Web Service**：
    - 点击 "New" → "Web Service"
-   - 连接你的 GitHub 仓库
-   - 设置：
-     - **Root Directory**: `server`
-     - **Build Command**: `npm install`
-     - **Start Command**: `node server.js`
+   - 连接你的 GitHub 仓库：`JiamingW-Official/4-Node`
+   - **重要设置**：
+     - **Name**: `economics-quiz-server`（或任何你喜欢的名字）
+     - **Root Directory**: `server` ⚠️ **必须设置为 `server`**
      - **Environment**: `Node`
+     - **Build Command**: `npm install`（或留空，Render 会自动检测）
+     - **Start Command**: `node server.js`
+     - **Plan**: `Free`（免费计划）
 
-3. **配置环境变量**：
-   - `PORT` 会自动设置
+3. **配置环境变量**（可选）：
+   - `NODE_ENV`: `production`
+   - `PORT` 会自动设置，无需手动配置
 
-4. **获取 WebSocket URL**：
-   - Render 提供的 URL 格式：`wss://your-app.onrender.com`
+4. **部署**：
+   - 点击 "Create Web Service"
+   - Render 会自动开始构建和部署
+   - 等待部署完成（通常 2-3 分钟）
+
+5. **获取 WebSocket URL**：
+   - 部署完成后，Render 会提供一个 URL
+   - 格式：`wss://your-app-name.onrender.com`
+   - **注意**：免费计划的服务在 15 分钟无活动后会休眠，首次访问可能需要几秒唤醒
+
+6. **使用 render.yaml（可选，更简单）**：
+   - 项目根目录已包含 `render.yaml` 配置文件
+   - 在 Render Dashboard 中，可以选择 "Apply Render Configuration"
+   - 这样会自动使用正确的配置
 
 ### 选项 3: Heroku
 

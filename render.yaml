@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: economics-quiz-server
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+
