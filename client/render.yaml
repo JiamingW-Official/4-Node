@@ -1,0 +1,13 @@
+# Render Static Site Configuration
+# This file is optional - you can configure everything in Render Dashboard instead
+
+services:
+  - type: web
+    name: economics-quiz-client
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_ENV
+        value: production
+

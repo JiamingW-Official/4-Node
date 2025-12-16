@@ -287,24 +287,27 @@ This creates optimized files in `client/dist/`
 
 ## 📦 Deployment
 
-### Quick Start (Automated)
+### Recommended: Render (All-in-One)
 
-This project includes GitHub Actions for automatic deployment. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+Deploy both server and client to Render for unified management. See [RENDER_CLIENT_DEPLOY.md](./RENDER_CLIENT_DEPLOY.md) for detailed instructions.
 
 **Quick Steps:**
 
-1. **Deploy WebSocket Server** (choose one):
-   - **Railway** (Recommended): Connect GitHub repo, select `server` folder, deploy
-   - **Render**: Create Web Service, set root directory to `server`
-   - **Heroku**: Use the included `Procfile`
+1. **Deploy WebSocket Server** (already done):
+   - Render Web Service at `wss://four-node-2025.onrender.com`
 
-2. **Configure GitHub Secret**:
-   - Go to repository Settings → Secrets and variables → Actions
-   - Add secret: `VITE_WS_URL` = `wss://your-server-url.com`
+2. **Deploy Client**:
+   - Render Dashboard → New → Static Site
+   - Connect repo: `JiamingW-Official/4-Node`
+   - Root Directory: `client`
+   - Build Command: `npm install && npm run build`
+   - Publish Directory: `dist`
 
-3. **Enable GitHub Pages**:
-   - Settings → Pages → Source: "GitHub Actions"
-   - Push to `main` branch to trigger automatic deployment
+### Alternative: GitHub Pages
+
+This project also includes GitHub Actions for automatic deployment to GitHub Pages. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+
+**Note**: If using GitHub Pages, you need to change `base` in `vite.config.js` to `/4-Node/`
 
 ### Manual Deployment
 
