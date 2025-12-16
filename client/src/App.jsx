@@ -254,7 +254,7 @@ function App() {
       <header className="hero">
         <div>
           <p className="eyebrow">Live Quiz</p>
-          <h1>Paper Quiz</h1>
+          <h1>Economics Quiz</h1>
           <div className="pill-row">
             <span className={`pill status ${connection}`}>{connection}</span>
             <span className="pill session">
